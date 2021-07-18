@@ -100,18 +100,15 @@ ProcessPointClouds<PointT>::SegmentPlane(
     float distanceThreshold) {
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
-    pcl::PointIndices::Ptr inliers{new pcl::PointIndices()};
-    // Fill in this function to find inliers for the cloud.
-    pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients());
-    pcl::SACSegmentation<PointT> seg;
-    seg.setOptimizeCoefficients(true);
-    seg.setModelType(pcl::SACMODEL_PLANE);
-    seg.setMethodType(pcl::SAC_RANSAC);
-    seg.setMaxIterations(maxIterations);
-    seg.setDistanceThreshold(distanceThreshold);
 
-    seg.setInputCloud(cloud);
-    seg.segment(*inliers, *coefficients);
+    // Segment plane using my custom function
+    // We can use pcl::SACSegmentation here. However, as the requirement of the course,
+    // I need to use my own implementation
+    std::unordered_set<int> inliersSet = RansacPlane<PointT>(cloud, maxIterations, distanceThreshold);
+    pcl::PointIndices::Ptr inliers{new pcl::PointIndices()};
+    for (const auto& el: inliersSet) {
+        inliers->indices.push_back(el);
+    }
     if (inliers->indices.size() == 0) {
         std::cerr << "Could not estimate a planar model for the given dataset."
                   << std::endl;
