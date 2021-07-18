@@ -1,4 +1,5 @@
-/* \author Aaron Brown */
+/* \course author Aaron Brown */
+/* \finished by Viet Anh Nguyen */
 // Create simple 3d highway enviroment using PCL
 // for exploring self-driving car sensors
 

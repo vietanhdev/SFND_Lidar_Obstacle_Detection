@@ -18,7 +18,8 @@
 #include <ctime>
 #include <chrono>
 #include "render/box.h"
-#include "ransac.h"
+#include "algorithms/ransacPlane.h"
+#include "algorithms/kdtreeClustering.h"
 
 template<typename PointT>
 class ProcessPointClouds {

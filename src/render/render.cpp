@@ -1,4 +1,5 @@
-/* \author Aaron Brown */
+/* \course author Aaron Brown */
+/* \finished by Viet Anh Nguyen */
 // Functions and structs used to render the enviroment
 // such as cars and the highway
 

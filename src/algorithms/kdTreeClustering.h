@@ -1,7 +1,8 @@
-/* \course author Aaron Brown */
-/* \finished by Viet Anh Nguyen */
-// Quiz on implementing kd tree
-#include "../../render/render.h"
+#ifndef KD_TREE_CLUSTERING_H_
+#define KD_TREE_CLUSTERING_H_
+
+#include <vector>
+#include <cmath>
 
 // Structure to represent node of kd tree
 struct Node {
@@ -85,3 +86,5 @@ struct KdTree {
         return ids;
     }
 };
+
+#endif

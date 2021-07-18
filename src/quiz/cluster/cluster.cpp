@@ -1,4 +1,5 @@
-/* \author Aaron Brown */
+/* \course author Aaron Brown */
+/* \finished by Viet Anh Nguyen */
 // Quiz on implementing simple RANSAC line fitting
 
 #include <chrono>
