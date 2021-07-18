@@ -93,8 +93,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer,
     std::cout << "Min z: " << minPt.z << std::endl;
 
     float filterRes = 0.4;
-    Eigen::Vector4f minPoint({-20, -6, -6, 1});
-    Eigen::Vector4f maxPoint({50, 7, 6, 1});
+    Eigen::Vector4f minPoint({-20, -6, -3, 1});
+    Eigen::Vector4f maxPoint({50, 6, 3, 1});
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr cloudFiltered =
         pointProcessorI->FilterCloud(inputCloud, filterRes, minPoint, maxPoint);
@@ -108,7 +108,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer,
 
     // Find and Render clusters
     std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters =
-        pointProcessorI->Clustering(segmentCloud.first, 3, 8, 100);
+        pointProcessorI->Clustering(segmentCloud.first, 0.6, 6, 300);
     int clusterId = 0;
     std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 1),
                                  Color(0, 0, 1)};

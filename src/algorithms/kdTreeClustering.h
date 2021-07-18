@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <vector>
+#include <queue>
 
 // Structure to represent node of kd tree
 struct Node {
@@ -59,7 +60,6 @@ struct KdTree {
         if (currentNode == NULL) {
             return;
         }
-
         if (currentNode->point[0] - distanceTol <= target[0] &&
             currentNode->point[0] + distanceTol >= target[0] &&
             currentNode->point[1] - distanceTol <= target[1] &&
@@ -100,12 +100,23 @@ std::vector<std::vector<int>> euclideanCluster(
     processed.resize(points.size(), false);
     for (int i = 0; i < points.size(); ++i) {
         if (processed[i]) continue;
-        std::vector<int> ids = tree->search(points[i], distanceTol);
+        std::queue<int> processing({i});
         std::vector<int> cluster;
-        for (int j = 0; j < ids.size(); ++j) {
-            cluster.push_back(ids[j]);
-            processed[ids[j]] = true;
+        while (!processing.empty()) {
+            int current = processing.front();
+            processing.pop();
+            if (!processed[current]) {
+                cluster.push_back(current);
+                processed[current] = true;
+                std::vector<int> near_ids = tree->search(points[current], distanceTol);
+                for (int j = 0; j < near_ids.size(); ++j) {
+                    if (!processed[near_ids[j]]) {
+                        processing.push(near_ids[j]);
+                    }
+                }
+            }
         }
+
         if (cluster.size() >= minSize && cluster.size() <= maxSize) {
             clusters.push_back(cluster);
         }
