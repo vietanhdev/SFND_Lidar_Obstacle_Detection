@@ -126,10 +126,11 @@ int main() {
 
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
-    //
+    
+    // Clustering
     std::vector<std::vector<int>> clusters =
         euclideanCluster(points, tree, 3.0);
-    //
+
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(
         endTime - startTime);

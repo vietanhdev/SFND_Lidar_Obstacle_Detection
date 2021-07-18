@@ -6,11 +6,8 @@
 
 #include "../../processPointClouds.h"
 #include "../../render/render.h"
-// using templates for processPointClouds so also include .cpp to help linker
 #include <cstdlib>
 #include <iostream>
-
-#include "../../processPointClouds.cpp"
 
 pcl::PointCloud<pcl::PointXYZ>::Ptr CreateData() {
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(

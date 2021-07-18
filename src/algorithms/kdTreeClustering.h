@@ -1,8 +1,10 @@
 #ifndef KD_TREE_CLUSTERING_H_
 #define KD_TREE_CLUSTERING_H_
 
-#include <vector>
+#include <pcl/common/common.h>
+
 #include <cmath>
+#include <vector>
 
 // Structure to represent node of kd tree
 struct Node {
@@ -17,11 +19,12 @@ struct Node {
 
 struct KdTree {
     Node* root;
+    int k = 3; // Hardcode for now
 
     KdTree() : root(NULL) {}
 
     void insert(std::vector<float> point, int id) {
-        int valueIndex = 0;
+        int pid = 0;
         Node** currentNode = &root;
         Node* newNode = new Node(point, id);
 
@@ -31,15 +34,14 @@ struct KdTree {
         }
 
         while (true) {
-            if ((*currentNode)->point[valueIndex] >
-                point[valueIndex]) {  // Go to left
+            if ((*currentNode)->point[pid] > point[pid]) {  // Go to left
                 if ((*currentNode)->left != NULL) {
                     currentNode = &((*currentNode)->left);
                 } else {
                     (*currentNode)->left = newNode;
                     break;
                 }
-            } else {
+            } else {  // Go to right
                 if ((*currentNode)->right != NULL) {
                     currentNode = &((*currentNode)->right);
                 } else {
@@ -47,7 +49,7 @@ struct KdTree {
                     break;
                 }
             }
-            valueIndex = 1 - valueIndex;
+            pid = (pid + 1) % k;
         }
     }
 
@@ -61,16 +63,19 @@ struct KdTree {
         if (currentNode->point[0] - distanceTol <= target[0] &&
             currentNode->point[0] + distanceTol >= target[0] &&
             currentNode->point[1] - distanceTol <= target[1] &&
-            currentNode->point[1] + distanceTol >= target[1]) {
+            currentNode->point[1] + distanceTol >= target[1] &&
+            currentNode->point[2] - distanceTol <= target[2] &&
+            currentNode->point[2] + distanceTol >= target[2]) {
             float x_diff = currentNode->point[0] - target[0];
             float y_diff = currentNode->point[1] - target[1];
-            float distance = sqrt(x_diff * x_diff + y_diff * y_diff);
+            float z_diff = currentNode->point[2] - target[2];
+            float distance = sqrt(x_diff * x_diff + y_diff * y_diff + z_diff * z_diff);
             if (distance < distanceTol) {
                 ids.push_back(currentNode->id);
             }
         }
 
-        int pid = depth % 2;
+        int pid = depth % k;
         if (currentNode->point[pid] + distanceTol > target[pid]) {
             search(currentNode->left, ids, target, distanceTol, depth + 1);
         }
@@ -86,5 +91,58 @@ struct KdTree {
         return ids;
     }
 };
+
+std::vector<std::vector<int>> euclideanCluster(
+    const std::vector<std::vector<float>>& points, KdTree* tree,
+    float distanceTol, float minSize, float maxSize) {
+    std::vector<std::vector<int>> clusters;
+    std::vector<bool> processed;
+    processed.resize(points.size(), false);
+    for (int i = 0; i < points.size(); ++i) {
+        if (processed[i]) continue;
+        std::vector<int> ids = tree->search(points[i], distanceTol);
+        std::vector<int> cluster;
+        for (int j = 0; j < ids.size(); ++j) {
+            cluster.push_back(ids[j]);
+            processed[ids[j]] = true;
+        }
+        if (cluster.size() >= minSize && cluster.size() <= maxSize) {
+            clusters.push_back(cluster);
+        }
+    }
+    return clusters;
+}
+
+template <typename PointT>
+std::vector<typename pcl::PointCloud<PointT>::Ptr> euclideanCluster(
+    typename pcl::PointCloud<PointT>::Ptr cloud, float distanceTol,
+    float minSize, float maxSize) {
+    // Prepare points
+    std::vector<std::vector<float>> points;
+    for (auto point : cloud->points) {
+        std::vector<float> pointVec({point.x, point.y, point.z});
+        points.push_back(pointVec);
+    }
+
+    // Prepare KDTree
+    KdTree* tree = new KdTree;
+    for (int i = 0; i < points.size(); i++) tree->insert(points[i], i);
+
+    // Do clustering
+    std::vector<std::vector<int>> clustersIndices =
+        euclideanCluster(points, tree, distanceTol, minSize, maxSize);
+
+    // Convert clusters indices to point clouds
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
+    for (int i = 0; i < clustersIndices.size(); ++i) {
+        typename pcl::PointCloud<PointT>::Ptr cluster(
+            new pcl::PointCloud<PointT>);
+        for (const auto& idx : clustersIndices[i])
+            cluster->push_back((*cloud)[idx]);
+        clusters.push_back(cluster);
+    }
+
+    return clusters;
+}
 
 #endif

@@ -6,8 +6,6 @@
 #include "processPointClouds.h"
 #include "render/render.h"
 #include "sensors/lidar.h"
-// using templates for processPointClouds so also include .cpp to help linker
-#include "processPointClouds.cpp"
 
 std::vector<Car> initHighway(bool renderScene,
                              pcl::visualization::PCLVisualizer::Ptr& viewer) {
@@ -110,7 +108,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer,
 
     // Find and Render clusters
     std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters =
-        pointProcessorI->Clustering(segmentCloud.first, 0.8, 8, 600);
+        pointProcessorI->Clustering(segmentCloud.first, 3, 8, 100);
     int clusterId = 0;
     std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 1),
                                  Color(0, 0, 1)};

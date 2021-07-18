@@ -14,8 +14,12 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 
+# Compile quiz
+add_subdirectory(src/quiz/cluster)
+add_subdirectory(src/quiz/ransac)
 
-add_executable (environment src/environment.cpp src/render/render.cpp src/processPointClouds.cpp)
+# Compile main
+add_executable (environment src/environment.cpp src/render/render.cpp)
 target_link_libraries (environment ${PCL_LIBRARIES})
 
 
